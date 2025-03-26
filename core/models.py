@@ -34,3 +34,11 @@ class Ride(models.Model):
     dropoff_longitude = models.DecimalField(decimal_places=7, max_digits=12, null=True)
     pickup_time = models.DateTimeField()
 
+
+class RideEvent(models.Model):
+    id_ride_event = models.AutoField(primary_key=True)
+    id_ride = models.ForeignKey(Ride, on_delete=models.CASCADE)
+    description = models.CharField(max_length=512)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
