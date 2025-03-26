@@ -34,6 +34,9 @@ class Ride(models.Model):
     dropoff_longitude = models.DecimalField(decimal_places=7, max_digits=12, null=True)
     pickup_time = models.DateTimeField()
 
+    def __str__(self):
+        return f"{self.pickup_latitude},{self.pickup_longitude}"
+
 
 class RideEvent(models.Model):
     id_ride_event = models.AutoField(primary_key=True)
