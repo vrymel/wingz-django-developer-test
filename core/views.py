@@ -12,7 +12,10 @@ class RideRestView(viewsets.ModelViewSet):
     filterset_class = RideFilter
 
     def get_queryset(self):
+        queryset = Ride.objects.all()
+
         query_params = self.request.query_params
+        ordering = query_params.get('ordering')
         start_latitude, start_longitude = query_params.get('start_latitude'), query_params.get('start_longitude')
 
         if start_latitude and start_longitude:
@@ -24,7 +27,7 @@ class RideRestView(viewsets.ModelViewSet):
             # Distance calculation is the distance between two points. This does not account the length
             # of the road between two points.
             # Reference: https://stackoverflow.com/a/5548877
-            qs = Ride.objects.annotate(
+            queryset = Ride.objects.annotate(
                 distance=ExpressionWrapper(
                     Sqrt(
                         Power(conversion_factor_miles_to_latitude * (F("pickup_latitude") - start_latitude), 2) +
@@ -32,10 +35,15 @@ class RideRestView(viewsets.ModelViewSet):
                     ),
                     output_field=FloatField(),
                 )
-            ).order_by("distance")
+            )
 
-            return qs
+            # Add ordering if none is provided. Only applied when start_latitude and start_longitude is provided.
+            if not ordering:
+                queryset = queryset.order_by('distance')
 
-        return Ride.objects.all()
+        # TODO: Fix me. Will throw an exception when sorting by distance by no start_latitude/longitude is provided.
+        if ordering:
+            for order in ordering.split(','):
+                queryset = queryset.order_by(order)
 
-    # sorting by distance
+        return queryset
