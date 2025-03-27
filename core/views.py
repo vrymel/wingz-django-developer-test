@@ -40,7 +40,9 @@ class RideRestView(viewsets.ModelViewSet):
         ordering = query_params.get('ordering')
         start_latitude, start_longitude = query_params.get('start_latitude'), query_params.get('start_longitude')
 
-        if start_latitude and start_longitude:
+        should_calculate_distance = start_latitude and start_longitude
+
+        if should_calculate_distance:
             # Use 110.574 for kilometers
             # Use 69.1 for miles
             conversion_factor_miles_to_latitude = 69.1
@@ -63,9 +65,17 @@ class RideRestView(viewsets.ModelViewSet):
             if not ordering:
                 queryset = queryset.order_by('distance')
 
-        # TODO: Fix me. Will throw an exception when sorting by distance by no start_latitude/longitude is provided.
         if ordering:
-            for order in ordering.split(','):
-                queryset = queryset.order_by(order)
+            order_columns = []
+            for o in ordering.split(','):
+                # Only allow distance sort if start_latitude/start_longitude is provided.
+                if 'distance' in o and should_calculate_distance:
+                    order_columns.append(o)
+                elif 'pickup_time' in o:
+                    order_columns.append(o)
+                else:
+                    # Noop if neither distance not pickup_time
+                    pass
+            queryset = queryset.order_by(*order_columns)
 
         return queryset
