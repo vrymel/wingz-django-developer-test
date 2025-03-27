@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, pagination
 from django.db.models import F, FloatField, ExpressionWrapper, Prefetch
 from django.db.models.functions import Sqrt, Power, Cos, Radians
 from django.utils.timezone import now
@@ -6,6 +6,12 @@ from datetime import timedelta
 from core.filters import RideFilter
 from core.models import Ride, RideEvent
 from core.serializers import RideSerializer
+
+
+# Uncomment to use Cursor based pagination. This will remove the need to query the total number of records.
+# class CustomCursorPagination(pagination.CursorPagination):
+#     ordering = 'pickup_time'
+#     page_size = 25
 
 
 class IsAdmin(permissions.IsAuthenticated):
@@ -18,6 +24,9 @@ class RideRestView(viewsets.ModelViewSet):
     serializer_class = RideSerializer
     filterset_class = RideFilter
     permission_classes = [IsAdmin]
+
+    # Uncomment to use Cursor based pagination.
+    # pagination_class = CustomCursorPagination
 
     def get_queryset(self):
         last_24_hours = now() - timedelta(hours=24)
