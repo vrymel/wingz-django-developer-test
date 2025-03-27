@@ -18,7 +18,7 @@ class RideSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ride
         fields = ['id_ride', 'id_rider', 'rider', 'id_driver', 'driver', 'status', 'pickup_latitude',
-                  'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude', 'pickup_time', 'ride_events', ]
+                  'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude', 'pickup_time', 'ride_events', 'distance']
 
     rider = UserSerializer(source='id_rider', read_only=True)
     id_rider = serializers.PrimaryKeyRelatedField(queryset=User.objects, write_only=True)
@@ -27,3 +27,12 @@ class RideSerializer(serializers.ModelSerializer):
     id_driver = serializers.PrimaryKeyRelatedField(queryset=User.objects, write_only=True)
 
     ride_events = RideEventSerializer(many=True, read_only=True)
+
+    distance = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_distance(obj):
+        if hasattr(obj, 'distance'):
+            return obj.distance
+
+        return None

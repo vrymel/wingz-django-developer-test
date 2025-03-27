@@ -1,4 +1,6 @@
 from rest_framework import viewsets
+from django.db.models import F, FloatField, ExpressionWrapper
+from django.db.models.functions import Sqrt, Power, Cos, Radians
 from core.filters import RideFilter
 from core.models import Ride
 from core.serializers import RideSerializer
@@ -9,5 +11,31 @@ class RideRestView(viewsets.ModelViewSet):
     serializer_class = RideSerializer
     filterset_class = RideFilter
 
-    # return related RideEvents
-    # pagination
+    def get_queryset(self):
+        query_params = self.request.query_params
+        start_latitude, start_longitude = query_params.get('start_latitude'), query_params.get('start_longitude')
+
+        if start_latitude and start_longitude:
+            # Use 110.574 for kilometers
+            # Use 69.1 for miles
+            conversion_factor_miles_to_latitude = 69.1
+            conversion_factor_degrees_to_radians = 57.3
+
+            # Distance calculation is the distance between two points. This does not account the length
+            # of the road between two points.
+            # Reference: https://stackoverflow.com/a/5548877
+            qs = Ride.objects.annotate(
+                distance=ExpressionWrapper(
+                    Sqrt(
+                        Power(conversion_factor_miles_to_latitude * (F("pickup_latitude") - start_latitude), 2) +
+                        Power(conversion_factor_miles_to_latitude * (start_longitude - F("pickup_longitude")) * Cos(Radians(F("pickup_latitude")) / conversion_factor_degrees_to_radians), 2)
+                    ),
+                    output_field=FloatField(),
+                )
+            ).order_by("distance")
+
+            return qs
+
+        return Ride.objects.all()
+
+    # sorting by distance
