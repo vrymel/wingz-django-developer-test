@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from django.db.models import F, FloatField, ExpressionWrapper
 from django.db.models.functions import Sqrt, Power, Cos, Radians
 from core.filters import RideFilter
@@ -6,10 +6,16 @@ from core.models import Ride
 from core.serializers import RideSerializer
 
 
+class IsAdmin(permissions.IsAuthenticated):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.is_admin()
+
+
 class RideRestView(viewsets.ModelViewSet):
     queryset = Ride.objects.all()
     serializer_class = RideSerializer
     filterset_class = RideFilter
+    permission_classes = [IsAdmin]
 
     def get_queryset(self):
         queryset = Ride.objects.all()

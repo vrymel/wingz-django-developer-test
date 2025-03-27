@@ -3,17 +3,23 @@ from django.db import models
 
 
 class User(AbstractUser):
+    ROLE_DEFAULT = 'default'
+    ROLE_ADMIN = 'admin'
+
     ROLE_CHOICES = [
-        ('default', 'Default'),
-        ('admin', 'Admin'),
+        (ROLE_DEFAULT, 'Default'),
+        (ROLE_ADMIN, 'Admin'),
     ]
     
     id_user = models.AutoField(primary_key=True)
-    role = models.CharField(max_length=255, choices=ROLE_CHOICES, default='default')
+    role = models.CharField(max_length=255, choices=ROLE_CHOICES, default=ROLE_DEFAULT)
     phone_number = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.username
+
+    def is_admin(self):
+        return self.role == self.ROLE_ADMIN
 
 
 class Ride(models.Model):
