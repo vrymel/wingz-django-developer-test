@@ -1,8 +1,10 @@
 from rest_framework import viewsets, permissions
-from django.db.models import F, FloatField, ExpressionWrapper
+from django.db.models import F, FloatField, ExpressionWrapper, Prefetch
 from django.db.models.functions import Sqrt, Power, Cos, Radians
+from django.utils.timezone import now
+from datetime import timedelta
 from core.filters import RideFilter
-from core.models import Ride
+from core.models import Ride, RideEvent
 from core.serializers import RideSerializer
 
 
@@ -18,7 +20,12 @@ class RideRestView(viewsets.ModelViewSet):
     permission_classes = [IsAdmin]
 
     def get_queryset(self):
-        queryset = Ride.objects.all()
+        last_24_hours = now() - timedelta(hours=24)
+        ride_events_queryset = RideEvent.objects.filter(created_at__gte=last_24_hours)
+
+        queryset = Ride.objects.select_related('id_rider', 'id_driver').prefetch_related(
+            Prefetch('ride_events', queryset=ride_events_queryset)
+        )
 
         query_params = self.request.query_params
         ordering = query_params.get('ordering')
@@ -33,7 +40,7 @@ class RideRestView(viewsets.ModelViewSet):
             # Distance calculation is the distance between two points. This does not account the length
             # of the road between two points.
             # Reference: https://stackoverflow.com/a/5548877
-            queryset = Ride.objects.annotate(
+            queryset = queryset.annotate(
                 distance=ExpressionWrapper(
                     Sqrt(
                         Power(conversion_factor_miles_to_latitude * (F("pickup_latitude") - start_latitude), 2) +

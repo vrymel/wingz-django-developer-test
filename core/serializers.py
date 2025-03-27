@@ -41,9 +41,5 @@ class RideSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_todays_ride_events(obj):
-        # Filter ride events to include only those from the last 24 hours
-        last_24_hours = now() - timedelta(hours=24)
-        events = RideEvent.objects.filter(id_ride=obj.id_ride, created_at__gte=last_24_hours)
-        
-        return RideEventSerializer(events, many=True).data
+        return RideEventSerializer(obj.ride_events.all(), many=True).data
     
