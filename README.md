@@ -86,6 +86,12 @@ Since the API is only accessible to users with the admin role, we need to manual
 
 Let's use the Django shell to update the role.
 
+```bash
+./manage.py shell
+```
+
+Once inside the shell, execute the following:
+
 ```python
 from django.contrib.auth import get_user_model
 User = get_user_model()
