@@ -2,7 +2,41 @@
 
 This is my solution to the Python/Django Developer Test.
 
-## Setup project
+## Setup project (Docker)
+
+The fastest way to start the project is to use Docker. A Dockerfile and compose file is provided.
+
+### Run the services
+
+```bash
+docker-compose up --build --force-recreate
+```
+
+Exposed ports:
+- `8000` : web service
+- `5432` : DB service
+
+### Database migration
+
+Initialize the database by connecting to a shell session on the running web container.
+
+```bash
+docker exec -it web_service bash
+```
+
+Then from the terminal session, execute Django's migrate.
+
+```bash
+./manage.py migrate
+```
+
+### Setup user
+
+Create the initial user while in the same terminal session. 
+
+Jump to the [Setup initial user](#setup-initial-user) section to setup
+
+## Setup project (local install)
 
 ### Requirements
 
@@ -39,7 +73,8 @@ Initialize the database. Make sure the database details are correctly set in `.e
 ./manage.py migrate
 ```
 
-### Setup initial user
+## Setup initial user
+<a name="setup-initial-user"></a>
 
 ```bash
 ./manage.py createsuperuser
