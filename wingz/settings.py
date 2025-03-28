@@ -27,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure--2hu+!bn_*44m10f4=d&7f_qr($yf8!&apk+@mojc_4)=2@t&0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
+    'daphne',
     'core',
 ]
 
@@ -154,3 +155,5 @@ if DEBUG:
     INTERNAL_IPS = [
         "127.0.0.1",
     ]
+
+ASGI_APPLICATION = "wingz.asgi.application"
