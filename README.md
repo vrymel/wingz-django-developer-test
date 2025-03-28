@@ -31,13 +31,15 @@ source .venv/bin/activate
 pip install -r requirements/local.txt
 ```
 
-## Run development server
+### Database migration
+
+Initialize the database. Make sure the database details are correctly set in `.env`.
 
 ```bash
-./manage.py runserver
+./manage.py migrate
 ```
 
-## Setup initial user
+### Setup initial user
 
 ```bash
 ./manage.py createsuperuser
@@ -56,6 +58,122 @@ u = User.objects.get(pk=1)
 u.role = User.ROLE_ADMIN
 u.save()
 ```
+
+## Run development server
+
+```bash
+./manage.py runserver
+```
+
+## API Details
+
+The following are the API available. A Postman collection is also added in the repo to
+interact with the API in Postman. See `Rides.postman_collection.json`.
+
+### Get token
+
+A `Token` is expected to be able to get data over the API.
+
+```
+GET /api-token-auth/
+Content-Type: application/x-www-form-urlencoded
+```
+
+Request body:
+```
+username={{username}}&password={{password}}
+```
+
+Replace `username/password` with a user with `admin` role.
+
+Example response:
+
+```json
+{
+    "token": "84cdd6809c5237b38c6320eb4902e7d7473ed9b4"
+}
+```
+
+Use the token value in the succeeding requests.
+
+
+### Rides list
+
+Retrieves a list of rides.
+
+```
+GET /api/rides/
+Authorization: Token {{token}}
+```
+
+Available query params:
+
+- `start_latitude` : Input latitude to query rides based on distance.
+- `start_longitude` : Input longitude to query rides based on distance.
+- `status` : To filter by Ride status.
+- `rider_email` : To filter by Rider email.
+- `ordering`: To order based on column. Available columns for sorting, `pickup_time` and `distance`. 
+Prefix with `-` (e.g. `-distance`) to sort in reverse order. Both may be provided separated by comma `,`.
+
+### Create Ride
+
+Create a ride given a payload.
+
+```
+POST /api/rides/
+Content-Type: application/json
+Authorization: Token {{token}}
+```
+
+Example request payload:
+
+```json
+{
+    "id_rider": 1,
+    "id_driver": 2,
+    "status": "new",
+    "pickup_latitude": "14.5998083",
+    "pickup_longitude": "120.9628558",
+    "dropoff_latitude": "14.5998083",
+    "dropoff_longitude": "120.9628558",
+    "pickup_time": "2025-05-22 08:00:00"
+}
+```
+
+### Update Ride
+```
+PUT /api/rides/{{id_ride}}
+Content-Type: application/json
+Authorization: Token {{token}}
+```
+
+Replace `{{id_ride}}` with the Ride ID to update.
+
+Example request payload (partial update):
+
+```
+{
+    "id_rider": 1,
+    "id_driver": 2,
+    "status": "en-route",
+    "pickup_time": "2025-03-29 05:02:28+08"
+}
+```
+
+The above fields are the minimum required to be able to update a Ride. Provide all fields (see create payload)
+to do a full update. 
+
+### Delete Ride
+
+To delete a ride.
+
+```
+DELETE /api/rides/{{id_ride}}
+Content-Type: application/json
+Authorization: Token {{token}}
+```
+
+Replace `{{id_ride}}` with the Ride ID to delete.
 
 ## Bonus - SQL
 

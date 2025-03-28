@@ -1,0 +1,260 @@
+{
+	"info": {
+		"_postman_id": "989ebb12-1d38-4a09-adc5-971b233b1012",
+		"name": "Rides",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6325043",
+		"_collection_link": "https://red-satellite-660007.postman.co/workspace/Wingz~13293a92-2827-440b-a3b5-1819eeedbfe6/collection/6325043-989ebb12-1d38-4a09-adc5-971b233b1012?action=share&source=collection_link&creator=6325043"
+	},
+	"item": [
+		{
+			"name": "Auth get token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"if (jsonData.token) {",
+							"    pm.globals.set(\"token\", jsonData.token);",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "vrymel.admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "vrymel.admin",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api-token-auth/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api-token-auth",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get list",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/rides/?start_latitude=14.5998083&start_longitude=120.9628558&status=en-route&ordering=-distance,pickup_time&rider_email=test1@example.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"rides",
+						""
+					],
+					"query": [
+						{
+							"key": "start_latitude",
+							"value": "14.5998083"
+						},
+						{
+							"key": "start_longitude",
+							"value": "120.9628558"
+						},
+						{
+							"key": "status",
+							"value": "en-route"
+						},
+						{
+							"key": "ordering",
+							"value": "-distance,pickup_time"
+						},
+						{
+							"key": "rider_email",
+							"value": "test1@example.com"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create ride",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id_rider\": 1,\n    \"id_driver\": 2,\n    \"status\": \"new\",\n    \"pickup_latitude\": \"14.5998083\",\n    \"pickup_longitude\": \"120.9628558\",\n    \"dropoff_latitude\": \"14.5998083\",\n    \"dropoff_longitude\": \"120.9628558\",\n    \"pickup_time\": \"2025-05-22 08:00:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/rides/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"rides",
+						""
+					],
+					"query": [
+						{
+							"key": "ordering",
+							"value": "distance",
+							"disabled": true
+						},
+						{
+							"key": "rider_email",
+							"value": "vrymel.dev@gmail.com",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update ride",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id_rider\": 1,\n    \"id_driver\": 2,\n    \"status\": \"en-route\",\n    \"pickup_time\": \"2025-03-29 05:02:28+08\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/rides/2/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"rides",
+						"2",
+						""
+					],
+					"query": [
+						{
+							"key": "ordering",
+							"value": "distance",
+							"disabled": true
+						},
+						{
+							"key": "rider_email",
+							"value": "vrymel.dev@gmail.com",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/rides/7/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"rides",
+						"7",
+						""
+					],
+					"query": [
+						{
+							"key": "ordering",
+							"value": "distance",
+							"disabled": true
+						},
+						{
+							"key": "rider_email",
+							"value": "vrymel.dev@gmail.com",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
