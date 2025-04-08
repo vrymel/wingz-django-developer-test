@@ -8,18 +8,17 @@ def min_trips_distance(trips, total_distance=0):
         # Only two remains, just add them to the value of total_distance - this terminates the recursion
         return total_distance + sum(trips)
 
-    while len(trips):
-        # Get the first two and do a sum to get the new trip
-        new_trip = sum(trips[0:2])
+    # Get the first two and do a sum to get the new trip
+    new_trip = sum(trips[0:2])
 
-        # Get the remaining trips (excluding the first two)
-        trips = trips[2:]
+    # Get the remaining trips (excluding the first two)
+    trips = trips[2:]
 
-        # Add the new_trip
-        trips.append(new_trip)
+    # Add the new_trip
+    trips.append(new_trip)
 
-        # Recursively calculate the trip until trips are empty
-        return min_trips_distance(trips, total_distance + new_trip)
+    # Recursively calculate the trip until trips are empty
+    return min_trips_distance(trips, total_distance + new_trip)
 
 
 # Example usage:
